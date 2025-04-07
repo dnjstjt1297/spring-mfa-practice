@@ -33,26 +33,26 @@ public class UserService {
 
         if(o.isPresent()){
             User u = o.get();
-            if(passwordEncoder.matches(user.getPassword(), u.getPassword())){
-                reNewOtp(u);
+            if(passwordEncoder.matches(user.getPassword(), u.getPassword())){ // 비밀번호 일치 확인
+                reNewOtp(u); // OTP 새로 발급
             }
         } else {
-            throw new BadCredentialsException("Bad credentials");
+            throw new BadCredentialsException("Bad credentials"); // 사용자 없거나 비밀번호 틀림
         }
     }
 
     private void reNewOtp(User u) {
-        String code = GeneratedCodeUtil.generateCode();
+        String code = GeneratedCodeUtil.generateCode(); // 랜덤 OTP 생성
 
-        Optional<Otp> userOtp = otpRepository.findOtpByUsername(u.getUsername());
+        Optional<Otp> userOtp = otpRepository.findOtpByUsername(u.getUsername()); // 기존 OTP 조회
 
         if(userOtp.isPresent()){
             Otp otp = userOtp.get();
-            otp.setCode(code);
+            otp.setCode(code); // 기존 OTP 코드 갱신
         } else {
             Otp otp = new Otp();
             otp.setUsername(u.getUsername());
-            otp.setCode(code);
+            otp.setCode(code); // 새 OTP 코드 생성
             otpRepository.save(otp);
         }
 
@@ -64,7 +64,7 @@ public class UserService {
         if(userOpt.isPresent()){
             Otp otp = userOpt.get();
 
-            if(otpToValidate.getCode().equals(otp.getCode())){
+            if(otpToValidate.getCode().equals(otp.getCode())){ // OTP 일치 여부 검사
                 return true;
             }
         }

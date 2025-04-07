@@ -12,7 +12,7 @@ public class GeneratedCodeUtil {
         String code;
 
         try{
-            SecureRandom random = SecureRandom.getInstanceStrong();
+            SecureRandom random = SecureRandom.getInstanceStrong(); // 랜덤 OTP 생성
 
             int c = random.nextInt(9000)+1000;
             code = String.valueOf(c);
