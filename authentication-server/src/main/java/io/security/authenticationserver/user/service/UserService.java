@@ -1,6 +1,6 @@
 package io.security.authenticationserver.user.service;
 
-import io.security.authenticationserver.otp.GeneratedCodeUtil;
+import io.security.authenticationserver.otp.CodeUtil;
 import io.security.authenticationserver.otp.entity.Otp;
 import io.security.authenticationserver.otp.repository.OtpRepository;
 import io.security.authenticationserver.user.entity.User;
@@ -42,7 +42,7 @@ public class UserService {
     }
 
     private void reNewOtp(User u) {
-        String code = GeneratedCodeUtil.generateCode(); // 랜덤 OTP 생성
+        String code = CodeUtil.generateCode(); // 랜덤 OTP 생성
 
         Optional<Otp> userOtp = otpRepository.findOtpByUsername(u.getUsername()); // 기존 OTP 조회
 

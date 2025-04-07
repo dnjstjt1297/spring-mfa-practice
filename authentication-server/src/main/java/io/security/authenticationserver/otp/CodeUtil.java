@@ -2,11 +2,10 @@ package io.security.authenticationserver.otp;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.NoSuchElementException;
 
-public class GeneratedCodeUtil {
+public class CodeUtil {
 
-    private GeneratedCodeUtil() {}
+    private CodeUtil() {}
 
     public static String generateCode() {
         String code;
