@@ -2,7 +2,6 @@ package io.security.autenticationserver.authenticationprovider;
 
 import io.security.autenticationserver.authentication.UsernamePasswordAuthentication;
 import io.security.autenticationserver.user.service.UserService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
