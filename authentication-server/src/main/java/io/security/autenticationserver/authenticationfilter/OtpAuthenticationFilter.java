@@ -1,23 +1,19 @@
 package io.security.autenticationserver.authenticationfilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Jwts;
 import io.security.autenticationserver.authentication.OtpAuthentication;
 import io.security.autenticationserver.authenticationfilter.util.CachedBodyHttpServletRequest;
-import io.security.autenticationserver.authenticationfilter.util.JsonRequestBodyParser;
-import io.security.autenticationserver.authenticationfilter.util.PemUtil;
+import io.security.autenticationserver.authenticationfilter.util.JsonRequestBodyUtil;
+import io.security.autenticationserver.authenticationfilter.util.TokenUtil;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.PrivateKey;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -27,11 +23,10 @@ public class OtpAuthenticationFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
 
-        byte[] bodyBytes = JsonRequestBodyParser.extractRequestBody(request);
-        Map<String, String> json = JsonRequestBodyParser.parseToMap(bodyBytes);
+        byte[] bodyBytes = JsonRequestBodyUtil.extractRequestBody(request);
+        Map<String, String> json = JsonRequestBodyUtil.parseToMap(bodyBytes);
 
         if (json == null || !json.containsKey("username") || !json.containsKey("code")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -46,7 +41,7 @@ public class OtpAuthenticationFilter extends OncePerRequestFilter {
 
         if (result.isAuthenticated()) {
             try {
-                String jwt = generateJwtToken(username, result);
+                String jwt = TokenUtil.generateJwtToken(username);
 
                 response.setHeader("Authorization", jwt);
 
@@ -62,16 +57,7 @@ public class OtpAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !"/user/otpCheck".equals(request.getRequestURI());
-    }
-
-    private String generateJwtToken(String username, Authentication result) throws Exception {
-        PrivateKey privateKey = PemUtil.loadPrivateKey("keys/private.pem");
-        return Jwts.builder()
-                .claim("username", username)
-                .claim("roles", result.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
-                .signWith(privateKey)
-                .compact();
+        return !"/user/otp_check".equals(request.getRequestURI());
     }
 
 }

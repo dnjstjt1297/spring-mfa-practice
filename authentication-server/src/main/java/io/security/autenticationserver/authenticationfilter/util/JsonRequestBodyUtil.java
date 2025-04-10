@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class JsonRequestBodyParser {
+public class JsonRequestBodyUtil {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

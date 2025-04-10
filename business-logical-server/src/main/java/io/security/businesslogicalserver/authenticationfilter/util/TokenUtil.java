@@ -9,11 +9,11 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.stream.Collectors;
 
-public class PemUtil {
+public class TokenUtil {
 
     public static PublicKey loadPublicKey(String filePath) {
         try {
-            InputStream inputStream = PemUtil.class.getClassLoader().getResourceAsStream(filePath);
+            InputStream inputStream = TokenUtil.class.getClassLoader().getResourceAsStream(filePath);
             if (inputStream == null) {
                 throw new IllegalArgumentException("Public key file not found: " + filePath);
             }

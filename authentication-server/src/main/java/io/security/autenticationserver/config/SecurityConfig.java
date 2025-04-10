@@ -1,7 +1,9 @@
 package io.security.autenticationserver.config;
 
+import io.security.autenticationserver.authenticationfilter.JwtAuthenticationFilter;
 import io.security.autenticationserver.authenticationfilter.LoginAuthenticationFilter;
 import io.security.autenticationserver.authenticationfilter.OtpAuthenticationFilter;
+import io.security.autenticationserver.authenticationprovider.JwtAuthenticationProvider;
 import io.security.autenticationserver.authenticationprovider.OtpAuthenticationProvider;
 import io.security.autenticationserver.authenticationprovider.UsernamePasswordAuthenticationProvider;
 import io.security.autenticationserver.user.service.UserService;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.util.List;
 
@@ -25,7 +28,8 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(UserService userService) {
         return new ProviderManager(List.of(
                 new UsernamePasswordAuthenticationProvider(userService),
-                new OtpAuthenticationProvider(userService)
+                new OtpAuthenticationProvider(userService),
+                new JwtAuthenticationProvider()
         ));
     }
 
@@ -40,6 +44,12 @@ public class SecurityConfig {
     }
 
     @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+        return new JwtAuthenticationFilter(authenticationManager);
+    }
+
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -47,10 +57,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    LoginAuthenticationFilter loginAuthenticationFilter,
-                                                   OtpAuthenticationFilter otpAuthenticationFilter) throws Exception {
+                                                   OtpAuthenticationFilter otpAuthenticationFilter,
+                                                   JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .addFilterBefore(loginAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(otpAuthenticationFilter, LoginAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)

@@ -24,10 +24,16 @@ public class AuthController {
         userService.auth(user);
     }
 
-    @PostMapping("/user/otpCheck")
+    @PostMapping("/user/otp_check")
     public void otpCheck(@RequestBody Otp otp) {
 
     }
+
+    @PostMapping("/user/refresh_token")
+    public void refreshToken(@RequestBody Otp otp) {
+
+    }
+
 }
 
 
