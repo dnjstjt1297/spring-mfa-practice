@@ -1,12 +1,13 @@
 package io.security.autenticationserver.config;
 
-import io.security.autenticationserver.authenticationfilter.JwtAuthenticationFilter;
+import io.security.autenticationserver.authenticationfilter.RefreshTokenAuthenticationFilter;
 import io.security.autenticationserver.authenticationfilter.LoginAuthenticationFilter;
 import io.security.autenticationserver.authenticationfilter.OtpAuthenticationFilter;
-import io.security.autenticationserver.authenticationprovider.JwtAuthenticationProvider;
+import io.security.autenticationserver.authenticationprovider.RefreshTokenAuthenticationProvider;
 import io.security.autenticationserver.authenticationprovider.OtpAuthenticationProvider;
 import io.security.autenticationserver.authenticationprovider.UsernamePasswordAuthenticationProvider;
-import io.security.autenticationserver.user.service.UserService;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,20 +17,23 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.util.List;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+
     @Bean
-    public AuthenticationManager authenticationManager(UserService userService) {
+    public AuthenticationManager authenticationManager( RefreshTokenAuthenticationProvider jwtAccessTokenAuthenticationProvider,
+                                                        OtpAuthenticationProvider otpAuthenticationProvider,
+                                                        UsernamePasswordAuthenticationProvider usernamePasswordAuthenticationProvider) {
         return new ProviderManager(List.of(
-                new UsernamePasswordAuthenticationProvider(userService),
-                new OtpAuthenticationProvider(userService),
-                new JwtAuthenticationProvider()
+                jwtAccessTokenAuthenticationProvider,
+                otpAuthenticationProvider,
+                usernamePasswordAuthenticationProvider
         ));
     }
 
@@ -44,8 +48,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new JwtAuthenticationFilter(authenticationManager);
+    public RefreshTokenAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+        return new RefreshTokenAuthenticationFilter(authenticationManager);
     }
 
 
@@ -58,9 +62,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    LoginAuthenticationFilter loginAuthenticationFilter,
                                                    OtpAuthenticationFilter otpAuthenticationFilter,
-                                                   JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+                                                   RefreshTokenAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
-                .addFilterBefore(loginAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(loginAuthenticationFilter, BasicAuthenticationFilter.class)
                 .addFilterAfter(otpAuthenticationFilter, LoginAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)

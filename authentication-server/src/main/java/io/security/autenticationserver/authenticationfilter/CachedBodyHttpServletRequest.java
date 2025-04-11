@@ -1,4 +1,4 @@
-package io.security.autenticationserver.authenticationfilter.util;
+package io.security.autenticationserver.authenticationfilter;
 
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
@@ -36,7 +36,7 @@ public class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
             }
 
             @Override
-            public int read() throws IOException {
+            public int read(){
                 return byteArrayInputStream.read();
             }
         };

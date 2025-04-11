@@ -1,4 +1,4 @@
-package io.security.autenticationserver.authenticationfilter.util;
+package io.security.autenticationserver.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
